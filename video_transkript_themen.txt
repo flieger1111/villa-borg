@@ -1,27 +1,19 @@
 Video-Link: https://youtu.be/eBEOaSMMAbo
 
-Hinweis:
-Ich konnte den Inhalt des YouTube-Links in dieser Umgebung nicht direkt auslesen,
-da externe Abrufe zu YouTube hier technisch blockiert sind (HTTP 403 beim Zugriff).
+Bitte füge hier den Transkripttext ein (Deutsch oder Englisch).
+Danach wird der Inhalt in folgende Themen gegliedert:
 
-Sobald du mir entweder
-1) den automatisch erzeugten YouTube-Transkripttext oder
-2) eine Untertiteldatei (.vtt/.srt)
-schickst, gliedere ich ihn dir sofort sauber nach Themen in diese Datei.
-
-Vorgeschlagene Themenstruktur (Template):
-
-1. Einleitung / Kontext
+1) Einleitung & Ziel des Videos
 - 
 
-2. Hauptthema A
+2) Zentrale Aussagen
 - 
 
-3. Hauptthema B
+3) Erklärungen / Hintergrund
 - 
 
-4. Beispiele / Anwendungen
+4) Beispiele / Praxisbezug
 - 
 
-5. Fazit / Kernaussagen
+5) Schlussfolgerung / Takeaways
 - 
