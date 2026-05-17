@@ -1,0 +1,27 @@
+Video-Link: https://youtu.be/eBEOaSMMAbo
+
+Hinweis:
+Ich konnte den Inhalt des YouTube-Links in dieser Umgebung nicht direkt auslesen,
+da externe Abrufe zu YouTube hier technisch blockiert sind (HTTP 403 beim Zugriff).
+
+Sobald du mir entweder
+1) den automatisch erzeugten YouTube-Transkripttext oder
+2) eine Untertiteldatei (.vtt/.srt)
+schickst, gliedere ich ihn dir sofort sauber nach Themen in diese Datei.
+
+Vorgeschlagene Themenstruktur (Template):
+
+1. Einleitung / Kontext
+- 
+
+2. Hauptthema A
+- 
+
+3. Hauptthema B
+- 
+
+4. Beispiele / Anwendungen
+- 
+
+5. Fazit / Kernaussagen
+- 
