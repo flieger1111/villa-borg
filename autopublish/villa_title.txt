@@ -1,1 +1,1 @@
-Noch kein neuer Beitrag
+Test der automatischen Veröffentlichung: Aktuelle Informationen aus Perl
