@@ -196,6 +196,9 @@ def main():
     print("URL:     ", result.get("url"))
 
     if args.publish:
+        if result.get("status") != "LIVE":
+            print("FEHLER: Veröffentlichung war angefordert, Blogger meldet aber nicht LIVE.")
+            sys.exit(1)
         save_state(current_hash, result)
         print("ERGEBNIS: Beitrag wurde ÖFFENTLICH veröffentlicht.")
         print("Doppel-Schutz wurde aktualisiert.")
