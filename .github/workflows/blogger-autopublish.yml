@@ -2,12 +2,6 @@ name: Blogger Autopublish
 
 on:
   workflow_dispatch:
-    inputs:
-      publish:
-        description: "Direkt veröffentlichen statt Entwurf"
-        required: true
-        default: false
-        type: boolean
   schedule:
     - cron: "0 5 * * *"
     - cron: "0 6 * * *"
@@ -77,17 +71,11 @@ jobs:
           printf '%s' "$BLOGGER_TOKEN_JSON" > "$HOME/blogger_token.json"
           chmod 600 "$HOME/blogger_token.json"
 
-      - name: Villa-Borg-Beitrag übertragen
+      - name: Villa-Borg-Beitrag veröffentlichen
         if: steps.localtime.outputs.run == 'true'
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.publish }}" = "true" ]; then
-            python publish_blogger.py \
-              --title autopublish/villa_title.txt \
-              --html autopublish/villa_post.html \
-              --publish
-          else
-            python publish_blogger.py \
-              --title autopublish/villa_title.txt \
-              --html autopublish/villa_post.html
-          fi
+          python publish_blogger.py \
+            --title autopublish/villa_title.txt \
+            --html autopublish/villa_post.html \
+            --publish
