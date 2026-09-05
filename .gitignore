@@ -1,0 +1,7 @@
+.last_publish.json
+autopublish.log
+*.bak
+token.json
+credentials.json
+client_secret*.json
+*.token
