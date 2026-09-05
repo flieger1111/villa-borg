@@ -35,6 +35,27 @@ jobs:
       - name: Repository auschecken
         if: steps.localtime.outputs.run == 'true'
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Prüfe frischen Tagesbeitrag
+        if: steps.localtime.outputs.run == 'true' && github.event_name == 'schedule'
+        shell: bash
+        run: |
+          now=$(date +%s)
+          title_ts=$(git log -1 --format=%ct -- autopublish/villa_title.txt)
+          post_ts=$(git log -1 --format=%ct -- autopublish/villa_post.html)
+          if [ -z "$title_ts" ] || [ -z "$post_ts" ]; then
+            echo "Kein Veröffentlichungsstand gefunden."
+            exit 1
+          fi
+          title_age=$((now-title_ts))
+          post_age=$((now-post_ts))
+          if [ "$title_age" -gt 10800 ] || [ "$post_age" -gt 10800 ]; then
+            echo "Kein frischer Tagesbeitrag innerhalb der letzten 3 Stunden. Veröffentlichung wird sicherheitshalber gestoppt."
+            exit 1
+          fi
+          echo "Frischer Tagesbeitrag erkannt."
 
       - name: Python einrichten
         if: steps.localtime.outputs.run == 'true'
