@@ -58,6 +58,7 @@ def read_last_hash():
 
 
 def save_state(content_hash, result):
+    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
     state = {
         "hash": content_hash,
         "post_id": result.get("id"),
@@ -70,6 +71,32 @@ def save_state(content_hash, result):
         json.dumps(state, ensure_ascii=False, indent=2),
         encoding="utf-8"
     )
+
+
+def already_live_on_blogger(service, title, content):
+    """Verhindert Doppelveröffentlichungen auch auf frischen GitHub-Runnern."""
+    try:
+        response = service.posts().list(
+            blogId=BLOG_ID,
+            status=["LIVE"],
+            maxResults=20,
+            fetchBodies=True
+        ).execute()
+    except Exception as exc:
+        print("WARNUNG: Online-Doppelprüfung nicht möglich:", exc)
+        return False
+
+    target_hash = make_hash(title.strip(), content.strip())
+    for post in response.get("items", []):
+        post_title = (post.get("title") or "").strip()
+        post_content = (post.get("content") or "").strip()
+        if make_hash(post_title, post_content) == target_hash:
+            print("NICHT VERÖFFENTLICHT")
+            print("Ein identischer öffentlicher Beitrag existiert bereits auf Blogger.")
+            print("URL:", post.get("url"))
+            return True
+
+    return False
 
 
 def main():
@@ -125,7 +152,7 @@ def main():
 
     current_hash = make_hash(title, content)
 
-    # Doppel-Schutz nur bei öffentlicher Veröffentlichung
+    # Lokaler Doppel-Schutz, falls die Statusdatei vorhanden ist.
     if args.publish and not args.force:
         previous_hash = read_last_hash()
 
@@ -143,6 +170,11 @@ def main():
         credentials=creds,
         cache_discovery=False
     )
+
+    # GitHub-Runner sind bei jedem Lauf frisch. Deshalb zusätzlich online prüfen.
+    if args.publish and not args.force:
+        if already_live_on_blogger(service, title, content):
+            return
 
     post = {
         "title": title,
