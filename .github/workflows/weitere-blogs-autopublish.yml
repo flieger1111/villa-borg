@@ -17,7 +17,6 @@ permissions:
 
 jobs:
   publish:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'schedule' && format('{0}', env.DUMMY) == '')
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
