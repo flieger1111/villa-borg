@@ -2,6 +2,12 @@ name: Weitere Blogs Autopublish
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "autopublish/gallier_title.txt"
+      - "autopublish/gallier_post.html"
   schedule:
     - cron: "20 5 * * *"
     - cron: "20 6 * * *"
@@ -11,7 +17,7 @@ permissions:
 
 jobs:
   publish:
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && format('{0}', env.DUMMY) == '')
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'schedule' && format('{0}', env.DUMMY) == '')
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -39,11 +45,11 @@ jobs:
             html: autopublish/amt_post.html
 
     steps:
-      - name: Prüfe Uhrzeit in Deutschland
+      - name: Prüfe Auslöser und Uhrzeit
         id: localtime
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "push" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           elif [ "$(TZ=Europe/Berlin date +%H:%M)" = "07:20" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
@@ -64,6 +70,14 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "publish=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "${{ github.event_name }}" = "push" ]; then
+            if [ "${{ matrix.name }}" = "Villa Borg und die Gallier" ]; then
+              echo "publish=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "publish=false" >> "$GITHUB_OUTPUT"
+            fi
             exit 0
           fi
           now=$(date +%s)
