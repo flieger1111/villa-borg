@@ -6,8 +6,16 @@ on:
     branches:
       - main
     paths:
+      - "autopublish/interfuel_title.txt"
+      - "autopublish/interfuel_post.html"
       - "autopublish/gallier_title.txt"
       - "autopublish/gallier_post.html"
+      - "autopublish/kritik_title.txt"
+      - "autopublish/kritik_post.html"
+      - "autopublish/oldtimer_title.txt"
+      - "autopublish/oldtimer_post.html"
+      - "autopublish/amt_title.txt"
+      - "autopublish/amt_post.html"
   schedule:
     - cron: "20 5 * * *"
     - cron: "20 6 * * *"
@@ -62,39 +70,53 @@ jobs:
         with:
           fetch-depth: 50
 
-      - name: Prüfe frischen Beitrag
+      - name: Prüfe Beitrag
         id: fresh
         if: steps.localtime.outputs.run == 'true'
         shell: bash
         run: |
+          if [ ! -f "${{ matrix.title }}" ] || [ ! -f "${{ matrix.html }}" ]; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          title=$(tr -d '\r\n' < "${{ matrix.title }}")
+          if [ -z "$title" ] || [ "$title" = "Noch kein neuer Beitrag" ]; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "Kein veröffentlichungsfähiger Beitrag für ${{ matrix.name }}."
+            exit 0
+          fi
+
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "publish=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+
           if [ "${{ github.event_name }}" = "push" ]; then
-            if [ "${{ matrix.name }}" = "Villa Borg und die Gallier" ]; then
+            changed=$(git diff-tree --no-commit-id --name-only -r "${{ github.sha }}")
+            if printf '%s\n' "$changed" | grep -Fxq "${{ matrix.title }}" || printf '%s\n' "$changed" | grep -Fxq "${{ matrix.html }}"; then
               echo "publish=true" >> "$GITHUB_OUTPUT"
+              echo "Geänderten Beitrag für ${{ matrix.name }} erkannt."
             else
               echo "publish=false" >> "$GITHUB_OUTPUT"
             fi
             exit 0
           fi
+
           now=$(date +%s)
           title_ts=$(git log -1 --format=%ct -- "${{ matrix.title }}")
           post_ts=$(git log -1 --format=%ct -- "${{ matrix.html }}")
           if [ -z "$title_ts" ] || [ -z "$post_ts" ]; then
             echo "publish=false" >> "$GITHUB_OUTPUT"
-            echo "Kein Veröffentlichungsstand für ${{ matrix.name }} gefunden."
             exit 0
           fi
+
           title_age=$((now-title_ts))
           post_age=$((now-post_ts))
           if [ "$title_age" -gt 21600 ] || [ "$post_age" -gt 21600 ]; then
             echo "publish=false" >> "$GITHUB_OUTPUT"
-            echo "Kein frischer Beitrag für ${{ matrix.name }} innerhalb der letzten 6 Stunden."
           else
             echo "publish=true" >> "$GITHUB_OUTPUT"
-            echo "Frischer Beitrag für ${{ matrix.name }} erkannt."
           fi
 
       - name: Python einrichten
