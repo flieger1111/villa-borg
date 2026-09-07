@@ -34,22 +34,27 @@ jobs:
             blog_id: "2224741555781912467"
             title: autopublish/interfuel_title.txt
             html: autopublish/interfuel_post.html
+            auto_labels: false
           - name: Villa Borg und die Gallier
             blog_id: "1059539831991894413"
             title: autopublish/gallier_title.txt
             html: autopublish/gallier_post.html
+            auto_labels: true
           - name: Kritische Betrachtungen Villa Borg
             blog_id: "3316720945188549518"
             title: autopublish/kritik_title.txt
             html: autopublish/kritik_post.html
+            auto_labels: false
           - name: Oldtimer Treff Oberleuken
             blog_id: "71070964330577048"
             title: autopublish/oldtimer_title.txt
             html: autopublish/oldtimer_post.html
+            auto_labels: false
           - name: Tempo im Amt
             blog_id: "6948849401707176750"
             title: autopublish/amt_title.txt
             html: autopublish/amt_post.html
+            auto_labels: false
 
     steps:
       - name: Prüfe Auslöser und Uhrzeit
@@ -143,8 +148,14 @@ jobs:
         if: steps.localtime.outputs.run == 'true' && steps.fresh.outputs.publish == 'true'
         shell: bash
         run: |
+          extra_args=()
+          if [ "${{ matrix.auto_labels }}" = "true" ]; then
+            extra_args+=(--auto-labels)
+          fi
+
           python publish_blogger.py \
             --blog-id "${{ matrix.blog_id }}" \
             --title "${{ matrix.title }}" \
             --html "${{ matrix.html }}" \
+            "${extra_args[@]}" \
             --publish
