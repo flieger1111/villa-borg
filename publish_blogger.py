@@ -96,6 +96,8 @@ def infer_labels(title, content):
         labels.append("Perl aktuell")
     if "nennig" in text:
         labels.append("Nennig")
+    if "besch" in text:
+        labels.append("Besch")
     if any(word in text for word in ("barriere", "inklusion", "mobilität für alle", "barrierefreier öpnv")):
         labels.append("Barrierefreiheit")
     if any(word in text for word in ("kommunalpolitik", "gemeinderat", "ortsrat", "ausschuss", "gemeinde perl")):
@@ -106,6 +108,8 @@ def infer_labels(title, content):
         labels.append("Schulweg")
     if "saarland" in text:
         labels.append("Saarland")
+    if any(word in text for word in ("bundestag", "bundesregierung", "deutschland politik", "kanzler")):
+        labels.append("Deutschland Politik")
 
     return normalize_labels(labels)
 
@@ -130,20 +134,54 @@ def sync_labels_on_existing_post(service, blog_id, post, labels):
     return updated
 
 
+def list_recent_live_posts(service, blog_id):
+    return service.posts().list(
+        blogId=blog_id,
+        status=["LIVE"],
+        maxResults=20,
+        fetchBodies=True
+    ).execute().get("items", [])
+
+
+def update_existing_post_by_title(service, blog_id, title, content, labels):
+    try:
+        posts = list_recent_live_posts(service, blog_id)
+    except Exception as exc:
+        print("WARNUNG: Titelprüfung auf Blogger nicht möglich:", exc)
+        return None
+
+    target_title = title.strip().casefold()
+    for post in posts:
+        if (post.get("title") or "").strip().casefold() != target_title:
+            continue
+
+        body = {"title": title, "content": content}
+        if labels:
+            body["labels"] = normalize_labels((post.get("labels") or []) + labels)
+
+        updated = service.posts().patch(
+            blogId=blog_id,
+            postId=post.get("id"),
+            body=body
+        ).execute()
+        print("BESTEHENDEN BEITRAG AKTUALISIERT")
+        print("URL:", updated.get("url") or post.get("url"))
+        if updated.get("labels"):
+            print("Labels:", ", ".join(updated.get("labels")))
+        return updated
+
+    return None
+
+
 def already_live_on_blogger(service, blog_id, title, content, labels=None):
     try:
-        response = service.posts().list(
-            blogId=blog_id,
-            status=["LIVE"],
-            maxResults=20,
-            fetchBodies=True
-        ).execute()
+        posts = list_recent_live_posts(service, blog_id)
     except Exception as exc:
         print("WARNUNG: Online-Doppelprüfung nicht möglich:", exc)
         return False
 
     target_hash = make_hash(title.strip(), content.strip())
-    for post in response.get("items", []):
+    for post in posts:
         post_title = (post.get("title") or "").strip()
         post_content = (post.get("content") or "").strip()
         if make_hash(post_title, post_content) == target_hash:
@@ -168,6 +206,7 @@ def main():
     parser.add_argument("--force", action="store_true", help="Doppel-Schutz umgehen")
     parser.add_argument("--labels", default="", help="Kommagetrennte Blogger-Labels")
     parser.add_argument("--auto-labels", action="store_true", help="Passende Blogger-Labels automatisch aus Titel und Inhalt ableiten")
+    parser.add_argument("--update-existing-title", action="store_true", help="Einen bestehenden LIVE-Beitrag mit exakt gleichem Titel aktualisieren statt einen neuen anzulegen")
     args = parser.parse_args()
 
     blog_id = str(args.blog_id).strip()
@@ -206,6 +245,13 @@ def main():
 
     creds = load_credentials()
     service = build("blogger", "v3", credentials=creds, cache_discovery=False)
+
+    if args.publish and args.update_existing_title:
+        updated = update_existing_post_by_title(service, blog_id, title, content, labels)
+        if updated:
+            save_state(blog_id, current_hash, updated)
+            print("ERGEBNIS: Bestehender Beitrag wurde ÖFFENTLICH aktualisiert.")
+            return
 
     if args.publish and not args.force:
         if already_live_on_blogger(service, blog_id, title, content, labels):
