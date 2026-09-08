@@ -92,6 +92,8 @@ def infer_labels(title, content):
     text = f"{title}\n{content}".casefold()
     labels = ["Gallier", "Villa Borg"]
 
+    if "gallier aktuell" in text or "tageslage" in text or "schlagzeilen des tages" in text:
+        labels.append("Tagesbericht")
     if "perl" in text:
         labels.append("Perl aktuell")
     if "nennig" in text:
