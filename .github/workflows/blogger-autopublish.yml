@@ -2,6 +2,11 @@ name: Blogger Autopublish
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "autopublish/villa_post.html"
   schedule:
     - cron: "0 5 * * *"
     - cron: "0 6 * * *"
@@ -18,7 +23,7 @@ jobs:
         id: localtime
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "push" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           elif [ "$(TZ=Europe/Berlin date +%H)" = "07" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
