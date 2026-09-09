@@ -17,8 +17,8 @@ on:
       - "autopublish/amt_title.txt"
       - "autopublish/amt_post.html"
   schedule:
-    - cron: "20 5 * * *"
-    - cron: "20 6 * * *"
+    - cron: "0 6 * * *"
+    - cron: "0 7 * * *"
 
 permissions:
   contents: read
@@ -68,7 +68,7 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "push" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
-          elif [ "$(TZ=Europe/Berlin date +%H:%M)" = "07:20" ]; then
+          elif [ "$(TZ=Europe/Berlin date +%H:%M)" = "08:00" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
