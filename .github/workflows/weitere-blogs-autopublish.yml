@@ -78,7 +78,7 @@ jobs:
         if: steps.localtime.outputs.run == 'true'
         uses: actions/checkout@v4
         with:
-          fetch-depth: 50
+          fetch-depth: 100
 
       - name: Prüfe Beitrag
         id: fresh
@@ -97,36 +97,43 @@ jobs:
             exit 0
           fi
 
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "publish=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          if [ "${{ github.event_name }}" = "push" ]; then
-            changed=$(git diff-tree --no-commit-id --name-only -r "${{ github.sha }}")
-            if printf '%s\n' "$changed" | grep -Fxq "${{ matrix.title }}" || printf '%s\n' "$changed" | grep -Fxq "${{ matrix.html }}"; then
-              echo "publish=true" >> "$GITHUB_OUTPUT"
-              echo "Geänderten Beitrag für ${{ matrix.name }} erkannt."
-            else
-              echo "publish=false" >> "$GITHUB_OUTPUT"
-            fi
-            exit 0
-          fi
-
           now=$(date +%s)
           title_ts=$(git log -1 --format=%ct -- "${{ matrix.title }}")
           post_ts=$(git log -1 --format=%ct -- "${{ matrix.html }}")
           if [ -z "$title_ts" ] || [ -z "$post_ts" ]; then
             echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "Kein vollständiger Veröffentlichungsstand für ${{ matrix.name }}."
             exit 0
           fi
 
           title_age=$((now-title_ts))
           post_age=$((now-post_ts))
+
+          if [ "${{ github.event_name }}" = "push" ]; then
+            changed=$(git diff-tree --no-commit-id --name-only -r "${{ github.sha }}")
+            if ! printf '%s\n' "$changed" | grep -Fxq "${{ matrix.html }}"; then
+              echo "publish=false" >> "$GITHUB_OUTPUT"
+              echo "Nur Titel oder andere Datei geändert; ${{ matrix.name }} wird noch nicht veröffentlicht."
+              exit 0
+            fi
+
+            if [ "$title_age" -gt 1800 ] || [ "$post_age" -gt 1800 ]; then
+              echo "publish=false" >> "$GITHUB_OUTPUT"
+              echo "Titel und Beitrag von ${{ matrix.name }} gehören nicht zu demselben frischen Redaktionslauf."
+              exit 0
+            fi
+
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+            echo "Frischen vollständigen Beitrag für ${{ matrix.name }} erkannt."
+            exit 0
+          fi
+
           if [ "$title_age" -gt 21600 ] || [ "$post_age" -gt 21600 ]; then
             echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "Beitrag für ${{ matrix.name }} ist nicht frisch genug und wird nicht veröffentlicht."
           else
             echo "publish=true" >> "$GITHUB_OUTPUT"
+            echo "Frischen Beitrag für ${{ matrix.name }} erkannt."
           fi
 
       - name: Python einrichten
