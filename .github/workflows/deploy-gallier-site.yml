@@ -23,8 +23,10 @@ jobs:
     steps:
       - name: Repository auschecken
         uses: actions/checkout@v4
-      - name: Pages konfigurieren
+      - name: Pages konfigurieren und falls möglich aktivieren
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - name: Website-Artefakt vorbereiten
         uses: actions/upload-pages-artifact@v3
         with:
