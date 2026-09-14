@@ -80,7 +80,11 @@ jobs:
         if: steps.localtime.outputs.run == 'true'
         shell: bash
         run: |
+          labels=()
+          if grep -qi "wochenendführer" autopublish/villa_title.txt; then
+            labels=(--labels "Wochenendführer")
+          fi
           python publish_blogger.py \
             --title autopublish/villa_title.txt \
             --html autopublish/villa_post.html \
-            --publish
+            --publish "${labels[@]}"
