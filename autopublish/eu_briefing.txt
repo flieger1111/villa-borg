@@ -1,0 +1,31 @@
+Welche EU-Gesetzgebung gilt als unnötig belastend, überschneidend oder widersprüchlich?
+
+Stand: 14. September 2026. Kurzübersicht für Veröffentlichung.
+
+Die EU-Regeln in Digital- und Nachhaltigkeitsbereichen verfolgen legitime Ziele: Datenschutz, fairer Wettbewerb, Produktsicherheit, Klimaschutz und nachhaltige Lieferketten. Parallel entwickelte Rechtsakte erzeugen jedoch kumulativen Verwaltungsaufwand, unterschiedliche Aufsichtswege und Unsicherheiten. Die Kommission reagiert mit Omnibus-Paketen, einem Digital Omnibus und einem Regulatory Deep Cleaning. Thinktanks wie Bruegel und Wirtschaftsverbände sehen weiteren Vereinfachungsbedarf, ohne die Schutzziele grundsätzlich in Frage zu stellen.
+
+1. Digitaler Regelungsrahmen: GDPR, AI Act, DSA, DMA, Data Act
+
+Der AI Act überschneidet sich mit der GDPR bei Folgenabschätzungen. Fundamental Rights Impact Assessments und Data Protection Impact Assessments haben unterschiedliche Reichweite, Aufsicht und Verfahren. Das führt zu Doppelarbeit bei Transparenz, Protokollierung und Betroffenenrechten, besonders wenn personenbezogene Daten in KI-Modellen stecken. Weitere Reibungen bestehen mit dem Data Act, DSA und DMA sowie dem Cyber Resilience Act. Unterschiedliche Fristen, Behörden und Verfahren erhöhen den Aufwand.
+
+2. Nachhaltigkeit: CSRD, CSDDD und Taxonomie
+
+CSRD, CSDDD und Taxonomie greifen auf ähnliche Daten, Risikoanalysen und Governance-Strukturen zurück. Es entsteht kumulativer Aufwand, auch wenn keine vollständig identische Doppelberichterstattung vorliegt. Vereinfachungsmaßnahmen haben Anwendungsbereiche und Fristen angepasst und sollen Doppelungen reduzieren.
+
+3. EUDR im Zusammenspiel mit CSDDD und CSRD
+
+Die Entwaldungsverordnung verlangt produktspezifische Geodaten und Sorgfaltserklärungen für bestimmte Rohstoffe. Sie ergänzt CSDDD und CSRD, ersetzt diese aber nicht. Unternehmen in betroffenen Branchen müssen parallele Prozesse führen.
+
+4. Produktregeln und geplanter European Product Act
+
+Sektorale Produktharmonisierung und allgemeine Sicherheitsregeln weisen Überschneidungen und Inkonsistenzen auf. Ein gemeinsamerer Rahmen soll Definitionen und Verfahren angleichen, digitale Produktinformationen stärken und Überlappungen beseitigen.
+
+5. Gold-Plating durch Mitgliedstaaten
+
+Bei Richtlinien können nationale Umsetzungen über den EU-Text hinausgehen. Das verschärft den Aufwand und fragmentiert den Binnenmarkt.
+
+6. Ansatzpunkte für weitere Vereinfachungen
+
+Genannt werden die Streichung von Doppelungen, einheitlichere Aufsicht, klarere Begriffsbestimmungen, abgestimmte Fristen und weniger nationale Zusatzanforderungen. Schutz- und Nachhaltigkeitsziele sollen bestehen bleiben, während der kumulierte Erfüllungsaufwand sinkt.
+
+Hinweis: Diese Übersicht ist eine redaktionelle Zusammenfassung und keine Rechtsberatung. Vor einer Veröffentlichung werden neue Tatsachen anhand aktueller Primärquellen geprüft.
