@@ -87,4 +87,5 @@ jobs:
           python publish_blogger.py \
             --title autopublish/villa_title.txt \
             --html autopublish/villa_post.html \
-            --publish "${labels[@]}"
+            --publish \
+            --update-existing-title "${labels[@]}"
