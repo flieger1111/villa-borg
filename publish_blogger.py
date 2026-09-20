@@ -250,7 +250,7 @@ def main():
     creds = load_credentials()
     service = build("blogger", "v3", credentials=creds, cache_discovery=False)
 
-    if args.publish and args.update_existing_title:
+    if args.publish:
         updated = update_existing_post_by_title(service, blog_id, title, content, labels)
         if updated:
             save_state(blog_id, current_hash, updated)
