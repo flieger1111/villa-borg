@@ -90,7 +90,7 @@ def normalize_labels(labels):
 
 def infer_labels(title, content):
     text = f"{title}\n{content}".casefold()
-    labels = ["Gallier", "Villa Borg"]
+    labels = ["Villa Borg"]
 
     if "gallier aktuell" in text or "tageslage" in text or "schlagzeilen des tages" in text:
         labels.append("Tagesbericht")
@@ -153,13 +153,15 @@ def update_existing_post_by_title(service, blog_id, title, content, labels):
         return None
 
     target_title = title.strip().casefold()
+    # Preserve the URL of a previously published daily post when its branding changes.
+    legacy_title = f"Gallier aktuell: {title}".casefold()
     for post in posts:
-        if (post.get("title") or "").strip().casefold() != target_title:
+        if (post.get("title") or "").strip().casefold() not in (target_title, legacy_title):
             continue
 
         body = {"title": title, "content": content}
         if labels:
-            body["labels"] = normalize_labels((post.get("labels") or []) + labels)
+            body["labels"] = normalize_labels([label for label in (post.get("labels") or []) if label.casefold() != "gallier"] + labels)
 
         updated = service.posts().patch(
             blogId=blog_id,
