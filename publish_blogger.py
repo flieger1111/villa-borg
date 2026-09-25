@@ -92,7 +92,7 @@ def infer_labels(title, content):
     text = f"{title}\n{content}".casefold()
     labels = ["Villa Borg"]
 
-    if "gallier aktuell" in text or "tageslage" in text or "schlagzeilen des tages" in text:
+    if "aktuelle tagespolitik in der gemeinde perl" in text or "tageslage" in text or "schlagzeilen des tages" in text:
         labels.append("Tagesbericht")
     if "perl" in text:
         labels.append("Perl aktuell")
@@ -154,9 +154,9 @@ def update_existing_post_by_title(service, blog_id, title, content, labels):
 
     target_title = title.strip().casefold()
     # Preserve the URL of a previously published daily post when its branding changes.
-    legacy_title = f"Gallier aktuell: {title}".casefold()
+    subject = title.removeprefix("Aktuelle Tagespolitik in der Gemeinde Perl: ")\n    legacy_titles = {\n        f"Gallier aktuell: {subject}".casefold(),\n        f"Tagesbericht: {subject}".casefold(),\n        f"Perl aktuell: {subject}".casefold(),\n    }
     for post in posts:
-        if (post.get("title") or "").strip().casefold() not in (target_title, legacy_title):
+        if (post.get("title") or "").strip().casefold() not in ({target_title} | legacy_titles):
             continue
 
         body = {"title": title, "content": content}
