@@ -1,1 +1,1 @@
-Vier Ortsräte in Perl tagen: Verkehr, Windenergie und Mängel im Bürgerhaus
+PERLCROSS in Perl: Sperrung am Kreckelberg und Hinweis zur Leuk
