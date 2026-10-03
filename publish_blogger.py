@@ -154,7 +154,12 @@ def update_existing_post_by_title(service, blog_id, title, content, labels):
 
     target_title = title.strip().casefold()
     # Preserve the URL of a previously published daily post when its branding changes.
-    subject = title.removeprefix("Aktuelle Tagespolitik in der Gemeinde Perl: ")\n    legacy_titles = {\n        f"Gallier aktuell: {subject}".casefold(),\n        f"Tagesbericht: {subject}".casefold(),\n        f"Perl aktuell: {subject}".casefold(),\n    }
+    subject = title.removeprefix("Aktuelle Tagespolitik in der Gemeinde Perl: ")
+    legacy_titles = {
+        f"Gallier aktuell: {subject}".casefold(),
+        f"Tagesbericht: {subject}".casefold(),
+        f"Perl aktuell: {subject}".casefold(),
+    }
     for post in posts:
         if (post.get("title") or "").strip().casefold() not in ({target_title} | legacy_titles):
             continue
