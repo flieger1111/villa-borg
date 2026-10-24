@@ -18,6 +18,10 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: blogger-6165637049845407616
+      cancel-in-progress: false
 
     steps:
       - name: Repository auschecken
