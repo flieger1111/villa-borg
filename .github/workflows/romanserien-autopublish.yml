@@ -9,9 +9,16 @@ on:
       - "autopublish/romanserien_post.html"
       - ".github/workflows/romanserien-autopublish.yml"
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: blogger-romanserien
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
 
@@ -28,6 +35,7 @@ jobs:
         run: |
           test -n "$BLOGGER_TOKEN_JSON"
           printf '%s' "$BLOGGER_TOKEN_JSON" > "$HOME/blogger_token.json"
+          chmod 600 "$HOME/blogger_token.json"
 
       - name: Blog-ID sicher aus der öffentlichen Blog-URL ermitteln
         id: blog
