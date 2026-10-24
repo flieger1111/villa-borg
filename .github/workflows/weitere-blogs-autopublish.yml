@@ -26,6 +26,10 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: blogger-${{ matrix.blog_id }}
+      cancel-in-progress: false
     strategy:
       fail-fast: false
       matrix:
@@ -36,7 +40,7 @@ jobs:
             html: autopublish/interfuel_post.html
             auto_labels: false
             update_existing_title: false
-          - name: Villa Borg und die Gallier
+          - name: Perl aktuell
             blog_id: "1059539831991894413"
             title: autopublish/gallier_title.txt
             html: autopublish/gallier_post.html
@@ -68,7 +72,7 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "push" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
-          elif [ "$(TZ=Europe/Berlin date +%H:%M)" = "08:00" ]; then
+          elif [ "$(TZ=Europe/Berlin date +%H)" = "08" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
