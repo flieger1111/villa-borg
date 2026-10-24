@@ -137,20 +137,27 @@ def sync_labels_on_existing_post(service, blog_id, post, labels):
 
 
 def list_recent_live_posts(service, blog_id):
-    return service.posts().list(
-        blogId=blog_id,
-        status=["LIVE"],
-        maxResults=20,
-        fetchBodies=True
-    ).execute().get("items", [])
+    posts = []
+    page_token = None
+    while True:
+        response = service.posts().list(
+            blogId=blog_id,
+            status=["LIVE"],
+            maxResults=100,
+            fetchBodies=True,
+            pageToken=page_token
+        ).execute()
+        posts.extend(response.get("items", []))
+        page_token = response.get("nextPageToken")
+        if not page_token:
+            return posts
 
 
 def update_existing_post_by_title(service, blog_id, title, content, labels):
     try:
         posts = list_recent_live_posts(service, blog_id)
     except Exception as exc:
-        print("WARNUNG: Titelprüfung auf Blogger nicht möglich:", exc)
-        return None
+        raise RuntimeError("Titelprüfung fehlgeschlagen; Veröffentlichung zum Schutz vor Duplikaten gestoppt.") from exc
 
     target_title = title.strip().casefold()
     # Preserve the URL of a previously published daily post when its branding changes.
@@ -167,6 +174,11 @@ def update_existing_post_by_title(service, blog_id, title, content, labels):
         body = {"title": title, "content": content}
         if labels:
             body["labels"] = normalize_labels([label for label in (post.get("labels") or []) if label.casefold() != "gallier"] + labels)
+
+        if all(post.get(key) == value for key, value in body.items()):
+            print("BESTEHENDER BEITRAG IST UNVERÄNDERT")
+            print("URL:", post.get("url"))
+            return post
 
         updated = service.posts().patch(
             blogId=blog_id,
@@ -186,8 +198,7 @@ def already_live_on_blogger(service, blog_id, title, content, labels=None):
     try:
         posts = list_recent_live_posts(service, blog_id)
     except Exception as exc:
-        print("WARNUNG: Online-Doppelprüfung nicht möglich:", exc)
-        return False
+        raise RuntimeError("Doppelprüfung fehlgeschlagen; Veröffentlichung zum Schutz vor Duplikaten gestoppt.") from exc
 
     target_hash = make_hash(title.strip(), content.strip())
     for post in posts:
