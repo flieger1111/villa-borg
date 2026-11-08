@@ -1,11 +1,9 @@
 name: Gallier Website Deploy
 
+# Legacy deployment kept for manual inspection only.
+# GitHub Pages currently publishes from main/(root).
+# Do not deploy site/gallier automatically into the same Pages environment.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'site/gallier/**'
-      - '.github/workflows/deploy-gallier-site.yml'
   workflow_dispatch:
 
 permissions:
