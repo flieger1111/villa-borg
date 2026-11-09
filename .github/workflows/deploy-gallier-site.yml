@@ -1,42 +1,23 @@
-name: Gallier Website Deploy
+name: Gallier Website Check
 
-# Legacy deployment kept for manual inspection only.
-# GitHub Pages currently publishes from main/(root).
-# Do not deploy site/gallier automatically into the same Pages environment.
+# The live GitHub Pages site is published separately from main/(root).
+# This legacy workflow must not configure or overwrite that Pages deployment.
+# Manual checks only; website content and domain settings remain unchanged.
 on:
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages-gallier
-  cancel-in-progress: true
 
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - name: Repository auschecken
         uses: actions/checkout@v4
-      - name: Pages konfigurieren und falls möglich aktivieren
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - name: Website-Artefakt vorbereiten
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site/gallier
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Website veröffentlichen
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Gallier HTML prüfen
+        run: |
+          test -s site/gallier/index.html
+          grep -qi '<html' site/gallier/index.html
+          grep -qi '<title>' site/gallier/index.html
+          echo "Gallier website source exists. No deployment or domain changes performed."
