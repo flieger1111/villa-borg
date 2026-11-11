@@ -167,6 +167,8 @@ def update_existing_post_by_title(service, blog_id, title, content, labels):
         f"Tagesbericht: {subject}".casefold(),
         f"Perl aktuell: {subject}".casefold(),
     }
+    if target_title == "barrierefreiheit in perl: bahnhöfe, wege und gebäude":
+        legacy_titles.add("barrierefreiheit gemeinde perl – beobachtung 9.9.2026")
     for post in posts:
         if (post.get("title") or "").strip().casefold() not in ({target_title} | legacy_titles):
             continue
