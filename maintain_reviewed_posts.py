@@ -11,6 +11,8 @@ FUEL_TITLES = {
     "Luxemburg: Benzin und Diesel seit 4. November deutlich günstiger",
 }
 DUP_TITLE = "Bahnhof Besch: Beide Bahnsteige laut DB stufenfrei – Einstieg bleibt offen"
+BARRIER_FREE_PATH = "/2026/10/barrierefreiheit-gemeinde-perl.html"
+BARRIER_FREE_TITLE = "Barrierefreiheit in Perl: Bahnhöfe, Wege und Gebäude"
 
 
 def normalized(content):
@@ -33,6 +35,9 @@ def main():
     service = build("blogger", "v3", credentials=load_credentials(), cache_discovery=False)
     posts = list_recent_live_posts(service, DEFAULT_BLOG_ID)
     for post in posts:
+        if (post.get("url") or "").endswith(BARRIER_FREE_PATH) and post.get("title") != BARRIER_FREE_TITLE:
+            service.posts().patch(blogId=DEFAULT_BLOG_ID, postId=post["id"], body={"title": BARRIER_FREE_TITLE}).execute()
+            print("BARRIEREFREIHEITS-TITEL AKTUALISIERT:", post.get("url"))
         message = notice(post)
         content = post.get("content", "")
         if not message or MARKER in content:
