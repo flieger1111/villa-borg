@@ -31,8 +31,67 @@ def notice(post):
     return None
 
 
+
+def improve_waldkindergarten_post(service):
+    """Update the existing article in place, preserving its URL and published date."""
+    from googleapiclient.errors import HttpError
+    marker = '<!-- seo-waldkindergarten-2026-11-17 -->'
+    post = None
+    for path in (
+        "/2026/10/ortsrat-borg-waldkindergarten-neu-auf.html",
+        "/2026/11/ortsrat-borg-waldkindergarten-neu-auf.html",
+    ):
+        try:
+            post = service.posts().getByPath(
+                blogId=DEFAULT_BLOG_ID, path=path
+            ).execute()
+            break
+        except HttpError as exc:
+            if exc.resp.status != 404:
+                raise
+    if post is None:
+        raise RuntimeError("Waldkindergarten article not found; no replacement created.")
+    content = post.get("content", "")
+    if marker in content:
+        print("SEO BEREITS AKTUELL:", post["url"])
+        return
+    intro = (
+        marker
+        + '<section aria-label="Aktualisierung zum Waldkindergarten Borg">'
+        + '<h2>Waldkindergarten Borg: Planungsstand vom 17. November 2026</h2>'
+        + '<p>Für den Waldkindergarten Borg hat der Gemeinderat Perl am 26. Oktober 2026 '
+        + 'die Abwägung und den Entwurf zur öffentlichen Auslegung einstimmig gebilligt. '
+        + 'Mosella 46/2026 veröffentlicht diesen Beschluss. Er ist ein Schritt im '
+        + 'Planverfahren und bestätigt weder einen Baubeginn noch einen Eröffnungstermin.</p>'
+        + '<p>Der ursprüngliche Bericht unten dokumentiert die ergänzte Tagesordnung '
+        + 'des Ortsrates Borg für den 5. Oktober 2026. Eine Tagesordnung und der spätere '
+        + 'Gemeinderatsbeschluss sind unterschiedliche Nachweise; das gesonderte Ergebnis '
+        + 'der Ortsratssitzung wird damit nicht bestätigt.</p>'
+        + '<p><a href="https://ol.wittich.de/titel/158/ausgabe/46/2026/artikel/00000000000055698171-OL-158-2026-46-46-0">'
+        + 'Amtliche Veröffentlichung der Gemeinderatsbeschlüsse</a> · '
+        + '<a href="https://magazin.villa-borg.com/gemeinde-perl/#waldkindergarten-borg">'
+        + 'Waldkindergarten Borg und aktuelle Kommunalpolitik in Perl</a> · '
+        + '<a href="https://magazin.villa-borg.com/heimatgeschichte/borg/">Geschichte des Ortsteils Borg</a></p>'
+        + '</section>\n'
+    )
+    labels = list(dict.fromkeys(post.get("labels", []) + ["Gemeinde Perl", "Borg", "Waldkindergarten", "Kommunalpolitik"]))
+    expected_title = "Waldkindergarten Borg: Planung und Beschlüsse im Überblick"
+    result = service.posts().patch(
+        blogId=DEFAULT_BLOG_ID,
+        postId=post["id"],
+        body={"title": expected_title, "content": intro + content, "labels": labels}
+    ).execute()
+    verified = service.posts().get(blogId=DEFAULT_BLOG_ID, postId=post["id"]).execute()
+    if verified.get("title") != expected_title or marker not in verified.get("content", ""):
+        raise RuntimeError("SEO update verification failed")
+    if verified.get("url") != post.get("url") or verified.get("published") != post.get("published"):
+        raise RuntimeError("Unexpected URL or publication-date change")
+    print("SEO GEPRUEFT; URL UND DATUM ERHALTEN:", verified["url"])
+
+
 def main():
     service = build("blogger", "v3", credentials=load_credentials(), cache_discovery=False)
+    improve_waldkindergarten_post(service)
     posts = list_recent_live_posts(service, DEFAULT_BLOG_ID)
     for post in posts:
         if (post.get("url") or "").endswith(BARRIER_FREE_PATH) and post.get("title") != BARRIER_FREE_TITLE:
